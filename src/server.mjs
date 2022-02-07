@@ -18,7 +18,7 @@ let validtradingPairs;
 
 //** Entry point for all requests -- for simplicity, responds to any url route */ 
 const requestListener = async (request, response) => {
-  log(`${request.method}  ${request.url}`);
+  log(`Begin ${request.method} ${request.url}`, 'i');
 
   let alertResponseBody, httpStatusCode;
   try {
@@ -42,6 +42,7 @@ const requestListener = async (request, response) => {
   // Send response
   response.writeHead(httpStatusCode, { 'Content-Type': 'application/json' });
   response.end(JSON.stringify(alertResponseBody));
+  log(`End ${request.method} ${request.url}`, 'i');
 }
 
 /**
@@ -50,6 +51,7 @@ const requestListener = async (request, response) => {
  * @throws CustomError - If request is 400 invalid
  */
 function validateAlertRequest(request) {
+  log('Validating request', 'i');
   const { method: requestMethod, url } = request;
   let { query: { deviation, tradingPairs } } = URL.parse(url, true);
   
@@ -88,6 +90,7 @@ function validateAlertRequest(request) {
       }
     }
   }
+  log('Request validated', 'i');
 }
 
 /**
@@ -97,6 +100,7 @@ function validateAlertRequest(request) {
  */
 async function handleAlertRequest(request) {
   let { query: { deviation: deviationThreshold, tradingPairs } } = URL.parse(request.url, true);
+  log(`Processing request, deviationThreshold=${deviationThreshold} and tradingPairs=${tradingPairs}`, 'i')
   if (tradingPairs.includes(',')) {
     tradingPairs = tradingPairs.split(','); // string -> array
   } else if (tradingPairs.toLowerCase() === 'all') {
@@ -104,20 +108,24 @@ async function handleAlertRequest(request) {
   } else {
     tradingPairs = [tradingPairs];
   }
-  
+
+  log(`Will get Gemini data for trading pairs: ${tradingPairs}`, 'd');
   const alertResponseBody = [];
   // Async get tradingPair data, interrupt on request finished
   return new Promise(async (resolve, reject) => {
     for (const [index, tradingPair] of tradingPairs.entries()) {
+      log(`Getting API data for ${tradingPair}`, 'd');
       // Sleep 1 second after every 10 requests to avoid rate limiting
       if ((index + 1) % 10 === 0) await new Promise(resolve => setTimeout(resolve, 1000));
       axios(`https://api.gemini.com/v2/ticker/${tradingPair}`) // HTTP GET
         .then(({data: tradingPairData}) => {
+          log(`Got API data for ${tradingPair}`, 'd');
           const priceCalculations = doPriceCalculations(tradingPairData);
           alertResponseBody.push(
             buildAlertResponse(tradingPair, {...tradingPairData, ...priceCalculations}, deviationThreshold)
           );
         }).catch((error) => {
+          log(`Failed getting API data for ${tradingPair}`, 'd');
           // Handle non-200 responses
           // TODO would be retry 429, but it isn't an issue with 10rps
           if (error.response) {
@@ -130,6 +138,7 @@ async function handleAlertRequest(request) {
         .finally(() => {
           if (alertResponseBody.length === tradingPairs.length) {
 
+            log(`All ${tradingPairs.length} trading pairs processed`, 'i');
             return resolve(alertResponseBody);
 
           }
@@ -145,6 +154,7 @@ async function handleAlertRequest(request) {
  * @throws CustomError - if there is an arithmetic error with simple-statistics library
  */
 function doPriceCalculations(tradingPairData) {
+  log(`Performing price calculations on ${tradingPairData.symbol}`, 'd');
   const { changes, close } = tradingPairData;
   changes.push(close); // insert close to end of changes list
 
@@ -171,6 +181,7 @@ function doPriceCalculations(tradingPairData) {
  * @returns 
  */
 function buildAlertResponse(tradingPair, tradingPairData, deviationThreshold = null) {
+  log(`Building response object for ${tradingPair}`, 'd');
   const alertResponse = {
     timestamp: isoTimestamp(),
     level: 'INFO',
