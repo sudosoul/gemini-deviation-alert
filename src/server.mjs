@@ -16,7 +16,7 @@ if (!SERVER_PORT) {
 }
 let validtradingPairs;
 
-// Handles the GET alerts request -- for simplicity, responds to any url route
+//** Entry point for all requests -- for simplicity, responds to any url route */ 
 const requestListener = async (request, response) => {
   log(`${request.method}  ${request.url}`);
 
@@ -44,6 +44,11 @@ const requestListener = async (request, response) => {
   response.end(JSON.stringify(alertResponseBody));
 }
 
+/**
+ * 
+ * @param {request} request - The request object from HTTP listener callback
+ * @throws CustomError - If request is 400 invalid
+ */
 function validateAlertRequest(request) {
   const { method: requestMethod, url } = request;
   let { query: { deviation, tradingPairs } } = URL.parse(url, true);
@@ -85,6 +90,11 @@ function validateAlertRequest(request) {
   }
 }
 
+/**
+ * 
+ * @param {request} request - The request object from HTTP listener callback
+ * @returns [alertResponse] - Array containing each trading_price alert response obj.
+ */
 async function handleAlertRequest(request) {
   let { query: { deviation: deviationThreshold, tradingPairs } } = URL.parse(request.url, true);
   if (tradingPairs.includes(',')) {
@@ -128,6 +138,12 @@ async function handleAlertRequest(request) {
   });
 }
 
+/**
+ * 
+ * @param {GeminiTickerV2Response} tradingPairData - The response obj from Gemini v2 ticker endpoint
+ * @returns {Object<Number>} - Object containing calculated 'mean', 'change', and 'priceDeviation' values
+ * @throws CustomError - if there is an arithmetic error with simple-statistics library
+ */
 function doPriceCalculations(tradingPairData) {
   const { changes, close } = tradingPairData;
   changes.push(close); // insert close to end of changes list
@@ -147,6 +163,13 @@ function doPriceCalculations(tradingPairData) {
   return { mean, change, priceDeviation };
 }
 
+/**
+ * 
+ * @param {string} tradingPair - The trading pair to build a response for ('btcusd')
+ * @param {mixed} tradingPairData - Mixed object of GeminiTickerV2Response & calculations, or CustomError
+ * @param {Number} deviationThreshold - the deviation threshold specified by user
+ * @returns 
+ */
 function buildAlertResponse(tradingPair, tradingPairData, deviationThreshold = null) {
   const alertResponse = {
     timestamp: isoTimestamp(),
