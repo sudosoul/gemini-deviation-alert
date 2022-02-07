@@ -160,6 +160,7 @@ Here's some examples..
      && curl "http://localhost:7777/alerts?deviation=${D}&tradingPairs=${TP}" \
        | jq '.[] | select(.deviation == true)'
      ```
+**Note:** We are limited to 10 requests per second by the Gemini API.
 
 ### Clean Up
 Once done, gracefully SIGINT `CTRL-C` the docker-compose process, and clear the env vars 
@@ -184,13 +185,17 @@ As a result, I plan on further researching & practicing with
 
 **As far as further improvments**, I'm sure I could think endlessly on this subject.
 At the very least, I would include tests for any production code. But I think tests are most valuable
-when they are writting *during* development, not after. When tests are written after development, most
+when they are written *during* development, not after. When tests are written after development, most
 of the time those tests will never fail because they are written around the existing code. Whereas
-when tests are written during development, it results in cleaner, better organized, and more pure (SRP) code.
+when tests are written during development, it results in cleaner, better organized, and more pure (SRP) code
+with a better depth of coverage, as the code is written around the tests. 
+
 
 If I was sticking with NodeJS, additionally I would use the `express` framework for the HTTP Server, and
 potentially implement Worker Threads for increased performance. At that point though, I'd rather just write
 it all in Go or Rust. 
+
+The code itself `server.mjs` also has some comments with `TODO`s.
 
 **As far as additional features**, I'm sure I could *also* think endlessly on this subject.  
 But one thing I definitely did realize, is that no two trading pairs are the same. So I think there
