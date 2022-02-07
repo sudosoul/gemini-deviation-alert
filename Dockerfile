@@ -7,4 +7,5 @@ WORKDIR /usr/src/app
 COPY . .
 RUN npm ci --only=prod
 
+EXPOSE $SERVER_PORT:$SERVER_PORT
 CMD node server.mjs
