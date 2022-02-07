@@ -51,7 +51,7 @@ const requestListener = async (request, response) => {
  * @throws CustomError - If request is 400 invalid
  */
 function validateAlertRequest(request) {
-  log('Validating request', 'i');
+  log('Validating request', 'd');
   const { method: requestMethod, url } = request;
   let { query: { deviation, tradingPairs } } = URL.parse(url, true);
   
@@ -90,7 +90,7 @@ function validateAlertRequest(request) {
       }
     }
   }
-  log('Request validated', 'i');
+  log('Request validated', 'd');
 }
 
 /**
