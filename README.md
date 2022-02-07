@@ -202,3 +202,4 @@ But one thing I definitely did realize, is that no two trading pairs are the sam
 are more factors (yet to be learned by me) that will have to go into understanding Market/Crypto volatility. 
 
 Thanks again for your time. 
+ 
