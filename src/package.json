@@ -1,0 +1,11 @@
+{
+  "name": "gemini-deviation-alert-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "server.mjs",
+  "author": "rob mullins <1@sudosoul.one>",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "simple-statistics": "^7.7.3"
+  }
+}
