@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: ./src
+      dockerfile: ../Dockerfile
+      args:
+        - SERVER_PORT
+    container_name: gemini-takehome-rob-nodejs-server
+    image: gemini-takehome-rob-nodejs-server:latest
+    ports:
+      - $SERVER_PORT:$SERVER_PORT
+
