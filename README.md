@@ -22,11 +22,7 @@ Minimal dependency bloat, 3 in total
 - [Conclusion](#conclusion)
 
 ## Introduction
-Hello all, my name is Rob, and I'm excited to be considered for this opportunity to work amongst
-a group of elite engineers such as yourselves! ;-P
-
-I know you are all very busy, so first - thanks for taking the time to review this.  
-I will try to keep this short and to the point.
+Hello all, my name is Rob.
 
 ### Problem Statement
 My task was to create a tool within 4 hours for the following scenario:
