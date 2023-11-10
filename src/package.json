@@ -5,7 +5,7 @@
   "main": "server.mjs",
   "author": "rob mullins <1@sudosoul.one>",
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^1.6.0",
     "simple-statistics": "^7.7.3"
   }
 }
